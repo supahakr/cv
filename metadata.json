@@ -1,0 +1,5 @@
+{
+  "name": "StereoAlign",
+  "description": "A professional tool to align, rotate, scale, and crop stereo image pairs for cross-view stereograms.",
+  "requestFramePermissions": []
+}
