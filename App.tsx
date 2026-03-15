@@ -246,7 +246,7 @@ const App: React.FC = () => {
                 {side === 'left' ? 'Left Image' : 'Right Image'}
             </label>
             <div 
-                className={`flex-1 min-h-[300px] border-4 border-dashed rounded-xl flex flex-col items-center justify-center cursor-pointer transition-colors relative overflow-hidden group
+                className={`flex-1 min-h-[150px] md:min-h-[300px] border-4 border-dashed rounded-xl flex flex-col items-center justify-center cursor-pointer transition-colors relative overflow-hidden group
                     ${src ? 'border-green-600 bg-gray-900' : 'border-gray-600 bg-gray-800 hover:bg-gray-700 hover:border-gray-500'}`}
                 onDrop={(e) => handleDrop(e, side)}
                 onDragOver={handleDragOver}
@@ -268,11 +268,11 @@ const App: React.FC = () => {
                         </div>
                     </div>
                 ) : (
-                    <div className="text-center p-6 text-gray-400">
-                        <FileImage size={48} className="mx-auto mb-4 opacity-50" />
-                        <p className="font-medium text-lg mb-1">Click to Upload</p>
-                        <p className="text-sm opacity-70">or drag and drop image here</p>
-                        <p className="mt-4 text-xs bg-gray-700 px-2 py-1 rounded inline-block">No file chosen</p>
+                    <div className="text-center p-2 md:p-6 text-gray-400">
+                        <FileImage size={32} className="mx-auto mb-2 md:mb-4 opacity-50 md:w-12 md:h-12" />
+                        <p className="font-medium text-sm md:text-lg mb-1">Click to Upload</p>
+                        <p className="text-xs md:text-sm opacity-70 hidden md:block">or drag and drop image here</p>
+                        <p className="mt-2 md:mt-4 text-[10px] md:text-xs bg-gray-700 px-2 py-1 rounded inline-block">No file chosen</p>
                     </div>
                 )}
             </div>
@@ -285,7 +285,7 @@ const App: React.FC = () => {
         case AppStep.UPLOAD:
             return (
                 <div className="flex flex-col h-full max-w-6xl mx-auto w-full gap-8">
-                    <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="flex-1 grid grid-cols-2 gap-2 md:gap-8">
                          <UploadBox 
                             side="left" 
                             src={srcL} 
@@ -487,8 +487,23 @@ const App: React.FC = () => {
                     <div className="w-full flex justify-between items-center mb-4 px-4">
                         <h3 className="font-bold text-xl text-green-400 flex items-center gap-2"><CheckCircle /> Result</h3>
                         <div className="flex gap-4 items-center bg-gray-800 p-2 rounded-lg">
-                             <span className="text-sm text-gray-300">Quality: {quality}%</span>
-                             <input type="range" min="10" max="100" value={quality} onChange={e => setQuality(Number(e.target.value))} className="w-32" />
+                             <label className="text-sm text-gray-300 flex items-center gap-2">
+                                Quality: 
+                                <input 
+                                    type="number" 
+                                    min="1" 
+                                    max="100" 
+                                    value={quality} 
+                                    onChange={e => {
+                                        let val = Number(e.target.value);
+                                        if (val > 100) val = 100;
+                                        if (val < 1) val = 1;
+                                        setQuality(val);
+                                    }} 
+                                    className="w-16 bg-gray-700 text-white border border-gray-600 rounded px-2 py-1 text-center focus:outline-none focus:border-blue-500" 
+                                />
+                                <span className="text-gray-400">/ 100</span>
+                             </label>
                              <button onClick={downloadResult} className="px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded font-bold text-white flex items-center gap-2">
                                 <Download size={18} /> Download JPG
                              </button>
