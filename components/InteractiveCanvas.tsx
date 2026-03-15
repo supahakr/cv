@@ -28,7 +28,7 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({
   const [scale, setScale] = useState(1);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
-  const [dragStart, setDragStart] = useState({ x: 0, y: 0 }); // Tracks movement delta
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [initialized, setInitialized] = useState(false);
   
   // Store the absolute start position of the click to distinguish from drag
@@ -201,12 +201,15 @@ const InteractiveCanvas: React.FC<InteractiveCanvasProps> = ({
   };
 
   const handleMouseUp = (e: MouseEvent) => {
-    // Calculate total distance moved since mouse down
+    const dx = e.clientX - dragStart.x; // Delta for last move (not used for click detect)
+    const dy = e.clientY - dragStart.y;
+    
+    // Calculate total distance from start of click
     const totalDx = e.clientX - clickStartRef.current.x;
     const totalDy = e.clientY - clickStartRef.current.y;
     const dist = Math.sqrt(totalDx * totalDx + totalDy * totalDy);
 
-    // If movement is very small, consider it a click
+    // If movement is very small (< 5px), consider it a click
     if (dist < 5 && active && image && canvasRef.current) {
         // Enforce Max Points
         if (points.length < maxPoints) {

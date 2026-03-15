@@ -183,9 +183,19 @@ const App: React.FC = () => {
     let nextL = canvasL;
     let nextR = canvasR;
 
-    const ratio = hL / hR;
-    
-    nextR = scaleImage(canvasR, ratio);
+    // Scale Logic: Upscale the smaller/lower-res image to match the larger/higher-res image.
+    // This preserves the quality of the better image.
+    if (hR > hL) {
+        // Right image feature is larger (or higher resolution). Scale Left UP to match.
+        const ratio = hR / hL;
+        nextL = scaleImage(canvasL, ratio);
+        // nextR stays as is
+    } else {
+        // Left image feature is larger (or equal). Scale Right UP to match.
+        const ratio = hL / hR;
+        nextR = scaleImage(canvasR, ratio);
+        // nextL stays as is
+    }
 
     setCanvasL(nextL);
     setCanvasR(nextR);

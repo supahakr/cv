@@ -154,28 +154,47 @@ export const cropImagesAligned = (
 
 export const mergeSideBySide = (left: HTMLCanvasElement, right: HTMLCanvasElement): HTMLCanvasElement => {
   const canvas = document.createElement('canvas');
-  // Explicitly use integer width/height to avoid black bars
-  const leftW = Math.floor(left.width);
-  const leftH = Math.floor(left.height);
-  const rightW = Math.floor(right.width);
-  const rightH = Math.floor(right.height);
+  
+  // 1. Determine common height (Max height to preserve quality)
+  const targetHeight = Math.max(left.height, right.height);
+  
+  // 2. Determine scale factors to reach that height
+  const scaleL = targetHeight / left.height;
+  const scaleR = targetHeight / right.height;
+  
+  // 3. Calculate the projected widths at that height
+  const projectedWL = left.width * scaleL;
+  const projectedWR = right.width * scaleR;
+  
+  // 4. Determine common width (Min width to ensure full overlap/no bars)
+  const targetWidth = Math.floor(Math.min(projectedWL, projectedWR));
+  const finalHeight = Math.floor(targetHeight);
 
-  canvas.width = leftW + rightW;
-  canvas.height = Math.max(leftH, rightH);
+  canvas.width = targetWidth * 2;
+  canvas.height = finalHeight;
   
   const ctx = canvas.getContext('2d');
   if (!ctx) throw new Error("Context error");
 
-  // Fill black (optional, but good if there's minor height difference)
-  ctx.fillStyle = "#000";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  // Helper to draw centered crop
+  const drawCentered = (img: HTMLCanvasElement, scale: number, offsetX: number) => {
+      // Calculate source crop
+      // We need 'targetWidth' pixels from the scaled image.
+      // In source pixels, that is targetWidth / scale
+      const srcCropW = targetWidth / scale;
+      const srcCropH = img.height; // We use full height since we matched height
+      
+      const srcX = (img.width - srcCropW) / 2;
+      
+      ctx.drawImage(
+          img,
+          srcX, 0, srcCropW, srcCropH,
+          offsetX, 0, targetWidth, finalHeight
+      );
+  };
 
-  // Center vertically if heights differ (though they shouldn't after crop)
-  const yL = Math.floor((canvas.height - leftH) / 2);
-  const yR = Math.floor((canvas.height - rightH) / 2);
-
-  ctx.drawImage(left, 0, yL);
-  ctx.drawImage(right, leftW, yR);
+  drawCentered(left, scaleL, 0);
+  drawCentered(right, scaleR, targetWidth);
 
   return canvas;
 };
